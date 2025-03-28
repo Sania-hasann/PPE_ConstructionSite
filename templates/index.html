@@ -34,10 +34,10 @@
         </div>
 
         <ul class="menu">
-            <li class="active"><a href="index.html"><i class="fa-solid fa-home"></i><span>Home</span></a></li>
-            <li><a href="upload.html"><i class="fa-solid fa-upload"></i><span>Upload Videos</span></a></li>
-            <li><a href="processed.html"><i class="fa-solid fa-square-poll-vertical"></i><span>Processed Results</span></a></li>
-            <li><a href="notifications.html"><i class="fas fa-bell"></i><span>Notifications</span></a></li>
+            <li class="active"><a href="index"><i class="fa-solid fa-home"></i><span>Home</span></a></li>
+            <li><a href="upload"><i class="fa-solid fa-upload"></i><span>Upload Videos</span></a></li>
+            <li><a href="processed"><i class="fa-solid fa-square-poll-vertical"></i><span>Processed Results</span></a></li>
+            <li><a href="notifications"><i class="fas fa-bell"></i><span>Notifications</span></a></li>
         </ul>
 
         <div class="bottom-menu">
@@ -54,7 +54,7 @@
 
     <!-- Main Content -->
     <div class="main-content" id="main-content">
-        <img src="../images/Dashboard.PNG" alt="Responsive Image">
+        <img src="{{ url_for('static', filename='images/Dashboard.PNG') }}" alt="Dashboard Image">
     </div>
 
     <script src="../static/script.js"></script>
