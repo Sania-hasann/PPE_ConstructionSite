@@ -425,26 +425,38 @@ body {
     background-color: #3a32b3;
 }
 
-/* Processing Bar */
 #processingContainer {
     display: none;
     margin-top: 20px;
+    width: 80%;
+    /* Center Horizontally */
+    display: flex;
+    justify-content: center; /* Centers horizontally */
+    align-items: center; /* Centers vertically */
 }
 
 .progress-bar {
-    width: 100%;
+    width: 80%;
     background-color: #ddd;
     border-radius: 5px;
-    height: 20px;
     overflow: hidden;
+    position: relative;
+    align-items: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: auto;
 }
 
 .progress {
     height: 100%;
     width: 0;
     background-color: #5a48e1;
+    text-align: center;
+    color: white;
+    font-weight: bold;
     border-radius: 5px;
-    transition: width 2s ease-in-out;
+    transition: width 0.3s ease-in-out;
 }
 
 /* Video Preview */
@@ -497,8 +509,9 @@ video {
 
 .notifications-header h2 {
     margin: 0;
-    font-size: 15px;
+    font-size: 18px;
     color: #5a48e1;
+    font-weight: 700;
 }
 .actions {
     display: flex;

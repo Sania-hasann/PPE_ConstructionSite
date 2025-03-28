@@ -34,21 +34,18 @@ document.addEventListener("DOMContentLoaded", function () {
     const fileInput = document.getElementById("fileInput");
     const browseButton = document.getElementById("browseButton");
     const processingContainer = document.getElementById("processingContainer");
-    const progressBar = document.querySelector(".progress");
+    const progressBar = document.querySelector(".progress-bar");
     const videoContainer = document.getElementById("videoContainer");
     const videoElement = document.querySelector("video");
 
-    // Open file picker when "Click to Browse" button is clicked
     browseButton.addEventListener("click", () => {
         fileInput.click();
     });
 
-    // Handle file selection
     fileInput.addEventListener("change", function (event) {
         processFile(event.target.files[0]);
     });
 
-    // Drag & Drop functionality
     dropArea.addEventListener("dragover", (event) => {
         event.preventDefault();
         dropArea.style.backgroundColor = "#f0f0ff";
@@ -65,26 +62,62 @@ document.addEventListener("DOMContentLoaded", function () {
         processFile(file);
     });
 
-    // Function to handle video processing
     function processFile(file) {
         if (file && file.type.startsWith("video/")) {
-            processingContainer.style.display = "block";
-            progressBar.style.width = "0%";
-
-            let progress = 0;
-            const interval = setInterval(() => {
-                progress += 10;
-                progressBar.style.width = progress + "%";
-                if (progress >= 100) {
-                    clearInterval(interval);
-                    showVideo(file);
-                }
-            }, 300);
+            processingContainer.style.display = "block";  // Ensure it's visible
+            const progressElement = document.querySelector(".progress"); // Get progress div
+            progressElement.style.width = "0%";
+            progressElement.innerText = "0%";
+        
+            uploadFile(file);
+            trackProgress();  // Start real-time tracking
         } else {
             alert("Please upload a valid video file.");
         }
-    }
+    }      
+    
+    function uploadFile(file) {
+        const formData = new FormData();
+        formData.append("file", file);
+    
+        // Display only the uploaded video
+        const uploadedFileURL = URL.createObjectURL(file);
+        videoElement.src = uploadedFileURL;
+        videoContainer.style.display = "block";
+    
+        fetch("/video", {
+            method: "POST",
+            body: formData,
+        })
+        .then(response => response.blob())
+        .then(blob => {
+            console.log("Processing completed, but the processed video will not be displayed.");
+            // Do not update videoElement.src here
+        })
+        .catch(error => {
+            console.error("Upload failed:", error);
+            alert("Failed to process video.");
+        });
+    }        
 
+    function trackProgress() {
+        const eventSource = new EventSource("/stream");
+        const progressElement = document.querySelector(".progress-bar");
+    
+        eventSource.onmessage = function (event) {
+            let percentage = parseInt(event.data);
+            console.log("Progress:", percentage);
+    
+            progressElement.style.width = percentage + "%";
+            progressElement.innerText = percentage + "%";
+    
+            if (percentage >= 100) {
+                eventSource.close();  // Stop tracking once done
+                progressElement.innerText = "Processing Complete!";
+            }
+        };
+    }       
+    
     // Function to display video
     function showVideo(file) {
         const fileURL = URL.createObjectURL(file);
@@ -93,6 +126,82 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 });
 
+// document.addEventListener("DOMContentLoaded", function () {
+//     const dropArea = document.getElementById("dropArea");
+//     const fileInput = document.getElementById("fileInput");
+//     const browseButton = document.getElementById("browseButton");
+//     const processingContainer = document.getElementById("processingContainer");
+//     const progressBar = document.querySelector(".progress");
+//     const videoContainer = document.getElementById("videoContainer");
+//     const videoElement = document.querySelector("video");
+
+//     browseButton.addEventListener("click", () => {
+//         fileInput.click();
+//     });
+
+//     fileInput.addEventListener("change", function (event) {
+//         processFile(event.target.files[0]);
+//     });
+
+//     dropArea.addEventListener("dragover", (event) => {
+//         event.preventDefault();
+//         dropArea.style.backgroundColor = "#f0f0ff";
+//     });
+
+//     dropArea.addEventListener("dragleave", () => {
+//         dropArea.style.backgroundColor = "white";
+//     });
+
+//     dropArea.addEventListener("drop", (event) => {
+//         event.preventDefault();
+//         dropArea.style.backgroundColor = "white";
+//         const file = event.dataTransfer.files[0];
+//         processFile(file);
+//     });
+
+//     function processFile(file) {
+//         if (file && file.type.startsWith("video/")) {
+//             processingContainer.style.display = "block";
+//             progressBar.style.width = "0%";
+    
+//             uploadFile(file);
+//             trackProgress();  // Start real-time tracking
+//         } else {
+//             alert("Please upload a valid video file.");
+//         }
+//     }
+
+//     function uploadFile(file) {
+//         const formData = new FormData();
+//         formData.append("file", file);
+
+//         fetch("/video", {
+//             method: "POST",
+//             body: formData,
+//         })
+//         .then(response => {
+//             if (!response.ok) {
+//                 throw new Error("Error processing video.");
+//             }
+//             return response.blob();
+//         })
+//         .then(blob => {
+//             const fileURL = URL.createObjectURL(blob);
+//             videoElement.src = fileURL;
+//             videoContainer.style.display = "block";
+//         })
+//         .catch(error => {
+//             console.error("Upload failed:", error);
+//             alert("Failed to process video.");
+//         });
+//     }
+//     // Function to display video
+//     function showVideo(file) {
+//         const fileURL = URL.createObjectURL(file);
+//         videoElement.src = fileURL;
+//         videoContainer.style.display = "block";
+//     }
+// });
 
 /* NOTIFICATIONS PAGE */
 document.addEventListener("DOMContentLoaded", function () {
