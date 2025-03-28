@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Responsive Sidebar</title>
+    <link rel="stylesheet" href="../static/styles.css">
+    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+</head>
+<body>
+
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+        <div class="nav-icons">
+            <i class="fas fa-bell"></i>
+            <i class="fas fa-cog"></i>
+        </div>
+    </nav>
+
+    <!-- Sidebar -->
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <div class="logo">
+                <button class="toggle-btn" onclick="toggleSidebar()">
+                    <i class="fa-solid fa-bars"></i>
+                </button>
+                <span class="text">Dashboard</span>
+            </div>
+        </div>
+
+        <div class="search-box">
+            <i class="fas fa-search"></i>
+            <input type="text" placeholder="Search...">
+        </div>
+
+        <ul class="menu">
+            <li class="active"><a href="index.html"><i class="fa-solid fa-home"></i><span>Home</span></a></li>
+            <li><a href="upload.html"><i class="fa-solid fa-upload"></i><span>Upload Videos</span></a></li>
+            <li><a href="processed.html"><i class="fa-solid fa-square-poll-vertical"></i><span>Processed Results</span></a></li>
+            <li><a href="notifications.html"><i class="fas fa-bell"></i><span>Notifications</span></a></li>
+        </ul>
+
+        <div class="bottom-menu">
+            <ul>
+                <li><i class="fas fa-sign-out-alt"></i><span>Logout</span></li>
+                <li class="dark-mode">
+                    <i class="fas fa-moon"></i>
+                    <span>Dark Mode</span>
+                    <input type="checkbox">
+                </li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content" id="main-content">
+        <img src="../images/Dashboard.PNG" alt="Responsive Image">
+    </div>
+
+    <script src="../static/script.js"></script>
+
+</body>
+</html>

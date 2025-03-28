@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Notifications</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="../static/styles.css">
+   
+</head>
+<body>
+
+    <nav class="navbar">
+        <div class="nav-icons">
+            <i class="fas fa-bell"></i>
+            <i class="fas fa-cog"></i>
+        </div>
+    </nav>
+    
+    <!-- Sidebar -->
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <div class="logo">
+                <button class="toggle-btn" onclick="toggleSidebar()">
+                    <i class="fa-solid fa-bars"></i>
+                </button>
+                <span class="text">Dashboard</span>
+            </div>
+        </div>
+
+        <ul class="menu">
+            <li><a href="index.html"><i class="fas fa-home"></i><span>Home</span></a></li>
+            <li><a href="upload.html"><i class="fa-solid fa-upload"></i><span>Upload Videos</span></a></li>
+            <li><a href="processed.html"><i class="fa-solid fa-square-poll-vertical"></i><span>Processed Results</span></a></li>
+            <li class="active"><a href="notifications.html"><i class="fas fa-bell"></i><span>Notifications</span></a></li>
+        </ul>
+    </div>
+
+    <!-- Content -->
+    <div class="notifications-container">
+        <div class="notifications-header">
+            <h2>Notifications</h2>
+            <div class="actions">
+                <button id="mark-read">Mark all as read</button>
+                <button id="clear-all">Clear all</button>
+            </div>
+            <div class="menu-icon" onclick="toggleMenu()">&#x22EE;</div>
+        <!-- Dropdown menu -->
+        <div class="dropdown-menu" id="dropdownMenu">
+            <button id="dropdown-mark-read">Mark All as Read</button>
+            <button id="dropdown-clear-all">Clear All</button>
+        </div>
+        </div>
+    
+        <div class="notifications-list" id="notifications-list">
+            <!-- Notifications will be added dynamically -->
+        </div>
+    
+        <button class="view-all" id="view-all-btn" style="display: none;">View all notifications</button>
+    </div>
+    
+    <script src="../static/script.js"></script>
+</body>
+</html>

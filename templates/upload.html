@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Upload Videos</title>
+    <link rel="stylesheet" href="../static/styles.css">
+</head>
+<body>
+
+    <nav class="navbar">
+        <div class="nav-icons">
+            <i class="fas fa-bell"></i>
+            <i class="fas fa-cog"></i>
+        </div>
+    </nav>
+
+    <!-- Sidebar -->
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <div class="logo">
+                <button class="toggle-btn" onclick="toggleSidebar()">
+                    <i class="fa-solid fa-bars"></i>
+                </button>
+                <span class="text">Dashboard</span>
+            </div>
+        </div>
+
+        <ul class="menu">
+            <li><a href="index.html"><i class="fas fa-home"></i><span>Home</span></a></li>
+            <li class="active"><a href="upload.html"><i class="fa-solid fa-upload"></i><span>Upload Videos</span></a></li>
+            <li><a href="processed.html"><i class="fa-solid fa-square-poll-vertical"></i><span>Processed Results</span></a></li>
+            <li><a href="notifications.html"><i class="fas fa-bell"></i><span>Notifications</span></a></li>
+        </ul>
+    </div>
+
+    <!-- Content -->
+    <div class="upload-container">
+        <div id="dropArea">
+            <p>Drag & Drop your video here</p>
+            <button id="browseButton">Click to Browse</button>
+        </div>
+        <input type="file" id="fileInput" accept="video/*" hidden>
+        
+        <div id="processingContainer">
+            <div class="progress-bar">
+                <div class="progress"></div>
+            </div>
+        </div>
+        
+        <div id="videoContainer">
+            <video controls></video>
+        </div>
+    </div>
+    
+    <script src="../static/script.js"></script>
+
+</body>
+</html>
