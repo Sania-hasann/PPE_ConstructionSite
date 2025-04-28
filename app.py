@@ -7,6 +7,7 @@ import numpy as np
 import time
 from werkzeug.utils import secure_filename
 from ultralytics import YOLO
+import threading
 
 app = Flask(__name__)
 
@@ -27,9 +28,9 @@ classNames = ['Hardhat', 'Mask', 'NO-Hardhat', 'NO-Mask', 'NO-Safety Vest', 'Per
 
 # Global variable to store the input path
 current_input_path = None
-
-
+notifications = []
 processing_progress = 0  # Global variable for tracking progress
+lock = threading.Lock()
 
 def process_video_batch(input_path, output_path, batch_size=8, skip_frames=1):
     global current_input_path, processing_progress
@@ -47,6 +48,8 @@ def process_video_batch(input_path, output_path, batch_size=8, skip_frames=1):
     frame_buffer = []
     frame_indices = []
     processed_frames = 0
+    batch_notifications = []  # Store notifications for each batch
+    video_name = os.path.basename(input_path)  # Get video filename
 
     while True:
         success, img = cap.read()
@@ -61,6 +64,7 @@ def process_video_batch(input_path, output_path, batch_size=8, skip_frames=1):
             results = model(frame_buffer, stream=False)
 
             for i, img in enumerate(frame_buffer):
+                detections = []
                 for r in results[i]:
                     boxes = r.boxes
                     for box in boxes:
@@ -70,30 +74,48 @@ def process_video_batch(input_path, output_path, batch_size=8, skip_frames=1):
                         currentClass = classNames[cls]
 
                         if conf > 0.5:
-                            if currentClass in ['NO-Hardhat', 'NO-Safety Vest', 'NO-Mask']:
-                                myColor = (0, 0, 255)
-                            elif currentClass in ['Hardhat', 'Safety Vest', 'Mask']:
-                                myColor = (0, 255, 0)
-                            else:
-                                myColor = (255, 0, 0)
+                            detections.append(currentClass)
 
+                            # Assign colors based on object type
+                            if currentClass in ['NO-Hardhat', 'NO-Safety Vest', 'NO-Mask']:
+                                myColor = (0, 0, 255)  # Red for unsafe PPE
+                            elif currentClass in ['Hardhat', 'Safety Vest', 'Mask']:
+                                myColor = (0, 255, 0)  # Green for safe PPE
+                            else:
+                                myColor = (255, 0, 0)  # Blue for other objects
+
+                            # Draw bounding box and label on image
                             cvzone.putTextRect(img, f'{currentClass} {conf}', (max(0, x1), max(35, y1)),
                                                scale=1, thickness=1, colorB=myColor,
                                                colorT=(255, 255, 255), colorR=myColor, offset=5)
                             cv2.rectangle(img, (x1, y1), (x2, y2), myColor, 3)
+
+                if detections:
+                    notification_text = f"{os.path.basename(input_path)} - Frame {frame_indices[i]}: {', '.join(detections)}"
+                    
+                    # Lock to ensure thread-safe access to the notifications list
+                    with lock:
+                        notifications.append({"text": notification_text, "read": False})
+                    # Push the notification to the frontend via SSE
+                    send_notification_to_frontend(notification_text)
 
                 out.write(img)
 
             frame_buffer.clear()
 
         processed_frames += 1
-        processing_progress = int((processed_frames / total_frames) * 100)  # Update global progress
+        processing_progress = int((processed_frames / total_frames) * 100)
 
     cap.release()
     out.release()
     processing_progress = 100  # Ensure progress reaches 100% at the end
     print(f"Processed video saved at: {output_path}")
 
+def send_notification_to_frontend(notification_text):
+    """Push notification to the frontend using SSE"""
+    global notifications
+    with lock:
+        notifications.append({"text": notification_text, "read": False})
 
 @app.route("/upload")
 def upload():
@@ -104,9 +126,10 @@ def upload():
 def processed():
     return render_template("processed.html") 
 
-@app.route("/notifications")
-def notifications():
+@app.route("/notifications-page")
+def notifications_page():
     return render_template("notifications.html")
+
 
 @app.route('/')
 def upload_form():
@@ -136,11 +159,36 @@ def handle_video():
 
     file.save(input_path)  # Save uploaded video
 
-    # Process the video with batch processing
-    process_video_batch(input_path, output_path, batch_size=8, skip_frames=1)
+    # Process the video in a separate thread
+    processing_thread = threading.Thread(target=process_video_batch, args=(input_path, output_path))
+    processing_thread.start()
+    processing_thread.join()  # Wait for processing to finish
 
-    # Return processed video
+    # Return the processed video file for download
     return send_file(output_path, as_attachment=True, download_name=filename)
+
+@app.route("/notifications-data")
+def get_notifications():
+    global notifications
+    with lock:
+        return jsonify(notifications) 
+
+@app.route('/mark-all-read', methods=['POST'])
+def mark_all_read():
+    """Marks all notifications as read."""
+    global notifications
+    with lock:
+        for notification in notifications:
+            notification["read"] = True
+    return jsonify({"success": True})
+
+@app.route('/clear-notifications', methods=['POST'])
+def clear_notifications():
+    """Clears all notifications."""
+    global notifications
+    with lock:
+        notifications = []  # Empty the list
+    return jsonify({"success": True})
 
 @app.route('/stream')
 def stream():
